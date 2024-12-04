@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Anatomy Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #340ce6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background-color: #2C3E50;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            color: #fff;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .counter {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            padding: 15px;
+            background-color: #34495E;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .options li:hover {
+            background-color: #1ABC9C;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #E74C3C;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #C0392B;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .correct {
+            background-color: #27AE60;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .wrong {
+            background-color: #E74C3C;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .next-btn {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Human Anatomy Quiz</h1>
+
+        <div id="quiz">
+            <div class="counter" id="questionCounter">Question 1 of 100</div>
+            <div class="question" id="questionText">Question will appear here</div>
+            <ul class="options" id="options"></ul>
+        </div>
+
+        <button class="btn hidden next-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+
+        <div id="result" class="hidden">
+            <p class="result">You answered <span id="correctCount"></span> questions correctly.</p>
+            <button class="btn" onclick="restartQuiz()">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+const questions = [
+    // Introduction to Human Anatomy
+    { question: "What is the study of the structure and shape of the human body called?", options: ["Physiology", "Anatomy", "Embryology", "Histology"], correctAnswer: 1 },
+    { question: "Which branch of anatomy focuses on structures visible to the naked eye?", options: ["Developmental anatomy", "Microscopic anatomy", "Macroscopic anatomy", "Surface anatomy"], correctAnswer: 2 },
+    { question: "What is the term for the study of tissues?", options: ["Embryology", "Histology", "Cytology", "Physiology"], correctAnswer: 1 },
+
+    // Levels of Organization
+    { question: "Which level of organization involves the combination of atoms to form molecules?", options: ["Cellular", "Molecular", "Tissue", "Organ"], correctAnswer: 1 },
+    { question: "Which is the highest level of structural organization in the human body?", options: ["Organ", "Organ system", "Organism", "Tissue"], correctAnswer: 2 },
+    { question: "Which level of organization includes the heart and kidneys?", options: ["Organ system", "Organ", "Tissue", "Cellular"], correctAnswer: 1 },
+
+    // Body Cavities
+    { question: "What does the dorsal body cavity house?", options: ["Heart and lungs", "Brain and spinal cord", "Liver and stomach", "Kidneys and bladder"], correctAnswer: 1 },
+    { question: "Which cavity contains the stomach and liver?", options: ["Thoracic cavity", "Pelvic cavity", "Abdominal cavity", "Cranial cavity"], correctAnswer: 2 },
+    { question: "The thoracic cavity is separated from the abdominopelvic cavity by what structure?", options: ["Rib cage", "Sternum", "Diaphragm", "Vertebral column"], correctAnswer: 2 },
+
+    // Skin and Its Tissues
+    { question: "Which layer of the skin is responsible for waterproofing?", options: ["Dermis", "Epidermis", "Subcutaneous layer", "Basement membrane"], correctAnswer: 1 },
+    { question: "Which cells in the skin produce melanin?", options: ["Keratinocytes", "Fibroblasts", "Melanocytes", "Adipocytes"], correctAnswer: 2 },
+    { question: "Which skin layer is also known as the hypodermis?", options: ["Epidermis", "Dermis", "Subcutaneous layer", "Basement membrane"], correctAnswer: 2 },
+
+    // Muscle Tissue
+    { question: "Which muscle type is striated and voluntary?", options: ["Smooth muscle", "Cardiac muscle", "Skeletal muscle", "Involuntary muscle"], correctAnswer: 2 },
+    { question: "Where is cardiac muscle found?", options: ["Walls of organs", "Attached to bones", "Heart wall", "Blood vessels"], correctAnswer: 2 },
+    { question: "Which muscle type has intercalated discs?", options: ["Smooth muscle", "Skeletal muscle", "Cardiac muscle", "None of the above"], correctAnswer: 2 },
+
+    // Nervous System
+    { question: "What is the primary functional cell of nervous tissue?", options: ["Neuroglial cell", "Neuron", "Myocyte", "Osteocyte"], correctAnswer: 1 },
+    { question: "Which division of the nervous system controls involuntary actions?", options: ["Central nervous system", "Somatic nervous system", "Autonomic nervous system", "Peripheral nervous system"], correctAnswer: 2 },
+    { question: "What type of neuron is characterized by having several dendrites and one axon?", options: ["Bipolar", "Multipolar", "Unipolar", "Sensory"], correctAnswer: 1 },
+
+    // Circulatory System
+    { question: "Which chamber of the heart receives oxygenated blood from the lungs?", options: ["Right atrium", "Right ventricle", "Left atrium", "Left ventricle"], correctAnswer: 2 },
+    { question: "What is the primary artery that distributes oxygenated blood to the body?", options: ["Pulmonary artery", "Aorta", "Vena cava", "Coronary artery"], correctAnswer: 1 },
+
+    // Digestive System
+    { question: "Where does most nutrient absorption occur?", options: ["Stomach", "Large intestine", "Small intestine", "Esophagus"], correctAnswer: 2 },
+    { question: "What is the primary function of the large intestine?", options: ["Nutrient absorption", "Protein digestion", "Water absorption", "Fat digestion"], correctAnswer: 2 },
+
+    // Respiratory System
+    { question: "Which structure connects the larynx to the bronchi?", options: ["Esophagus", "Trachea", "Pharynx", "Diaphragm"], correctAnswer: 1 },
+    { question: "Where does gas exchange occur in the respiratory system?", options: ["Bronchioles", "Alveoli", "Trachea", "Nasal cavity"], correctAnswer: 1 },
+    { question: "Which cartilage forms the 'Adam’s apple'?", options: ["Cricoid cartilage", "Epiglottis", "Arytenoid cartilage", "Thyroid cartilage"], correctAnswer: 3 },
+
+    // Urinary System
+    { question: "What is the functional unit of the kidney?", options: ["Ureter", "Nephron", "Glomerulus", "Collecting duct"], correctAnswer: 1 },
+    { question: "Which organ stores urine before excretion?", options: ["Kidney", "Urethra", "Urinary bladder", "Ureter"], correctAnswer: 2 },
+    { question: "How many layers are present in the walls of the ureter?", options: ["One", "Two", "Three", "Four"], correctAnswer: 2 },
+
+    // Endocrine System
+    { question: "Which gland is known as the 'master gland'?", options: ["Pineal gland", "Thyroid gland", "Pituitary gland", "Adrenal gland"], correctAnswer: 2 },
+    { question: "What hormone does the pancreas produce to lower blood glucose levels?", options: ["Glucagon", "Cortisol", "Insulin", "Adrenaline"], correctAnswer: 2 },
+    { question: "Which hormone regulates the sleep-wake cycle?", options: ["Oxytocin", "Melatonin", "Thyroxine", "Prolactin"], correctAnswer: 1 },
+
+    // Lymphatic System
+    { question: "What is the primary function of the lymphatic system?", options: ["Transport oxygen", "Immunological defense", "Hormone regulation", "Nutrient absorption"], correctAnswer: 1 },
+    { question: "Which lymphatic organ filters blood and removes old red blood cells?", options: ["Thymus", "Lymph nodes", "Spleen", "Tonsils"], correctAnswer: 2 },
+    { question: "Which vessel collects lymph from the lower body?", options: ["Thoracic duct", "Right lymphatic duct", "Cisterna chyli", "Axillary lymphatic duct"], correctAnswer: 0 },
+
+    // Skeletal System
+    { question: "What type of bone tissue is found at the ends of long bones?", options: ["Compact bone", "Spongy bone", "Cartilage", "Periosteum"], correctAnswer: 1 },
+    { question: "Which cells are responsible for bone formation?", options: ["Osteocytes", "Osteoclasts", "Osteoblasts", "Chondrocytes"], correctAnswer: 2 },
+    { question: "What connects bone to bone?", options: ["Ligaments", "Tendons", "Cartilage", "Fascia"], correctAnswer: 0 },
+
+    // Nervous System (continued)
+    { question: "Which part of the brain controls balance and coordination?", options: ["Cerebrum", "Cerebellum", "Brainstem", "Thalamus"], correctAnswer: 1 },
+    { question: "Which division of the nervous system connects the brain to the spinal cord?", options: ["Autonomic", "Peripheral", "Brainstem", "Somatic"], correctAnswer: 2 },
+    { question: "Which part of a neuron receives signals from other neurons?", options: ["Axon", "Dendrites", "Synapse", "Myelin sheath"], correctAnswer: 1 },
+
+    // Cardiovascular System
+    { question: "Which blood vessels carry blood away from the heart?", options: ["Veins", "Arteries", "Capillaries", "Venules"], correctAnswer: 1 },
+    { question: "Which chamber of the heart pumps blood to the lungs?", options: ["Right atrium", "Right ventricle", "Left atrium", "Left ventricle"], correctAnswer: 1 },
+    { question: "What prevents backflow of blood in the heart?", options: ["Coronary arteries", "Valves", "Myocardium", "Aorta"], correctAnswer: 1 },
+
+    // Digestive System (continued)
+    { question: "What is the primary function of the stomach?", options: ["Absorb nutrients", "Store bile", "Digest proteins", "Produce insulin"], correctAnswer: 2 },
+    { question: "Which part of the digestive system is responsible for water absorption?", options: ["Stomach", "Large intestine", "Small intestine", "Liver"], correctAnswer: 1 },
+    { question: "What is the longest part of the digestive tract?", options: ["Large intestine", "Esophagus", "Stomach", "Small intestine"], correctAnswer: 3 },
+
+    // Respiratory System (continued)
+    { question: "What is the function of the epiglottis?", options: ["Prevent air from entering the esophagus", "Prevent food from entering the trachea", "Filter air entering the lungs", "Facilitate gas exchange"], correctAnswer: 1 },
+    { question: "Which lung has three lobes?", options: ["Right lung", "Left lung"], correctAnswer: 0 },
+    { question: "What muscle is primarily responsible for breathing?", options: ["Intercostal muscles", "Diaphragm", "Pectoral muscles", "Sternocleidomastoid"], correctAnswer: 1 },
+
+    // Urinary System (continued)
+    { question: "Which structure transports urine from the kidneys to the bladder?", options: ["Urethra", "Collecting ducts", "Ureters", "Renal pelvis"], correctAnswer: 2 },
+    { question: "Which part of the nephron is responsible for filtration?", options: ["Loop of Henle", "Glomerulus", "Proximal convoluted tubule", "Distal convoluted tubule"], correctAnswer: 1 },
+    { question: "How is urine excreted from the body?", options: ["Through the ureters", "Through the urethra", "Through the collecting ducts", "Through the renal pelvis"], correctAnswer: 1 },
+
+    // Endocrine System (continued)
+    { question: "What is the function of oxytocin?", options: ["Regulate blood sugar levels", "Stimulate uterine contractions and milk release", "Control metabolic rate", "Promote growth"], correctAnswer: 1 },
+    { question: "Which hormone increases calcium levels in the blood?", options: ["Calcitonin", "Parathyroid hormone", "Aldosterone", "Insulin"], correctAnswer: 1 },
+    { question: "What does the adrenal medulla secrete?", options: ["Thyroxine and triiodothyronine", "Insulin and glucagon", "Adrenaline and noradrenaline", "Estrogen and progesterone"], correctAnswer: 2 },
+
+    // Skeletal System (continued)
+    { question: "What type of joint is found in the shoulder and hip?", options: ["Hinge joint", "Ball-and-socket joint", "Pivot joint", "Saddle joint"], correctAnswer: 1 },
+    { question: "Which part of the skeleton includes the skull, vertebral column, and rib cage?", options: ["Appendicular skeleton", "Axial skeleton"], correctAnswer: 1 },
+    { question: "What type of cartilage is found in the intervertebral discs?", options: ["Hyaline cartilage", "Elastic cartilage", "Fibrocartilage", "Articular cartilage"], correctAnswer: 2 },
+
+    // Nervous System (continued)
+    { question: "What part of the brain is responsible for memory and learning?", options: ["Cerebrum", "Cerebellum", "Brainstem", "Medulla oblongata"], correctAnswer: 0 },
+    { question: "Which lobe of the brain is responsible for vision?", options: ["Frontal lobe", "Parietal lobe", "Temporal lobe", "Occipital lobe"], correctAnswer: 3 },
+    { question: "What is the function of the myelin sheath?", options: ["Transmit signals to muscles", "Insulate axons and speed up nerve impulses", "Support neurons", "Detect sensory stimuli"], correctAnswer: 1 },
+
+    // Lymphatic System (continued)
+    { question: "Which lymphatic organ is most active during childhood?", options: ["Tonsils", "Thymus", "Spleen", "Lymph nodes"], correctAnswer: 1 },
+    { question: "What type of cells are produced in the bone marrow and mature in the thymus?", options: ["B-cells", "T-cells", "Neutrophils", "Macrophages"], correctAnswer: 1 },
+    { question: "Which lymphatic structure collects lymph from the lower body?", options: ["Right lymphatic duct", "Thoracic duct", "Cisterna chyli", "Lymph nodes"], correctAnswer: 2 },
+
+    // Cardiovascular System (continued)
+    { question: "Which blood vessels are responsible for the exchange of gases and nutrients between the blood and tissues?", options: ["Arteries", "Veins", "Capillaries", "Arterioles"], correctAnswer: 2 },
+    { question: "What type of blood vessel carries oxygenated blood away from the heart?", options: ["Veins", "Capillaries", "Arteries", "Venules"], correctAnswer: 2 },
+    { question: "Which heart chamber pumps oxygenated blood into the aorta?", options: ["Left atrium", "Right atrium", "Left ventricle", "Right ventricle"], correctAnswer: 2 },
+
+    // Digestive System (continued)
+    { question: "What is the function of the pancreas in digestion?", options: ["Produce bile", "Produce digestive enzymes", "Absorb nutrients", "Produce stomach acid"], correctAnswer: 1 },
+    { question: "What is the first section of the small intestine called?", options: ["Duodenum", "Jejunum", "Ileum", "Cecum"], correctAnswer: 0 },
+    { question: "What is the primary function of the liver in digestion?", options: ["Produce insulin", "Produce bile", "Store glucose", "Absorb nutrients"], correctAnswer: 1 },
+
+    // Skeletal System (continued)
+    { question: "Which type of bone is the femur classified as?", options: ["Long bone", "Short bone", "Flat bone", "Irregular bone"], correctAnswer: 0 },
+    { question: "Which cells are responsible for the breakdown of bone tissue?", options: ["Osteoblasts", "Osteocytes", "Osteoclasts", "Chondrocytes"], correctAnswer: 2 },
+    { question: "What is the function of the periosteum?", options: ["Store calcium", "Produce red blood cells", "Provide a protective covering for bones", "Form cartilage"], correctAnswer: 2 },
+
+    // Nervous System (continued)
+    { question: "What is the function of the spinal cord?", options: ["Control heart rate", "Relay signals between the brain and body", "Regulate temperature", "Control digestion"], correctAnswer: 1 },
+    { question: "Which type of glial cell is responsible for myelination in the central nervous system?", options: ["Astrocytes", "Microglia", "Oligodendrocytes", "Schwann cells"], correctAnswer: 2 },
+    { question: "Which part of the brain controls autonomic functions such as heartbeat and breathing?", options: ["Cerebrum", "Cerebellum", "Medulla oblongata", "Thalamus"], correctAnswer: 2 },
+
+    // Respiratory System (continued)
+    { question: "What is the primary function of the respiratory system?", options: ["To break down food", "To circulate blood", "To exchange gases between the body and the environment", "To produce hormones"], correctAnswer: 2 },
+    { question: "Which structure prevents food from entering the trachea during swallowing?", options: ["Pharynx", "Epiglottis", "Larynx", "Bronchi"], correctAnswer: 1 },
+    { question: "What is the primary function of the alveoli in the lungs?", options: ["Produce mucus", "Filter the air", "Facilitate gas exchange", "Warm the air"], correctAnswer: 2 },
+
+    // Endocrine System (continued)
+    { question: "Which hormone is produced by the thyroid gland to regulate metabolism?", options: ["Thyroxine (T4)", "Insulin", "Progesterone", "Cortisol"], correctAnswer: 0 },
+    { question: "Which gland is responsible for regulating the body’s calcium levels?", options: ["Pituitary gland", "Thyroid gland", "Parathyroid glands", "Adrenal glands"], correctAnswer: 2 },
+    { question: "Which hormones are produced by the adrenal cortex?", options: ["Epinephrine and norepinephrine", "Cortisol and aldosterone", "Insulin and glucagon", "Estrogen and progesterone"], correctAnswer: 1 }
+];
+
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
+
+        // Load the current question and options
+        function loadQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById("questionText").textContent = currentQuestion.question;
+            document.getElementById("questionCounter").textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+
+            const optionsList = document.getElementById("options");
+            optionsList.innerHTML = ""; // Clear previous options
+
+            currentQuestion.options.forEach((option, index) => {
+                const li = document.createElement("li");
+                li.textContent = option;
+                li.onclick = function() { checkAnswer(index); };
+                optionsList.appendChild(li);
+            });
+
+            // Hide the Next button initially
+            document.getElementById("nextBtn").classList.add("hidden");
+        }
+
+        // Check the answer and show feedback
+        function checkAnswer(selectedIndex) {
+            const currentQuestion = questions[currentQuestionIndex];
+            const optionsList = document.getElementById("options").children;
+
+            // Highlight correct and incorrect answers
+            for (let i = 0; i < optionsList.length; i++) {
+                const option = optionsList[i];
+                if (i === currentQuestion.correctAnswer) {
+                    option.style.backgroundColor = '#27AE60'; // Green for correct
+                } else {
+                    option.style.backgroundColor = '#E74C3C'; // Red for incorrect
+                }
+            }
+
+            // Update the score based on the answer
+            if (selectedIndex === currentQuestion.correctAnswer) {
+                correctAnswers++;
+            } else {
+                wrongAnswers++;
+            }
+
+            // Show the Next button
+            document.getElementById("nextBtn").classList.remove("hidden");
+        }
+
+        // Go to the next question
+        function nextQuestion() {
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // Show the results at the end of the quiz
+        function showResults() {
+            document.getElementById("quiz").classList.add("hidden");
+            document.getElementById("result").classList.remove("hidden");
+            document.getElementById("correctCount").textContent = correctAnswers;
+        }
+
+        // Restart the quiz
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            wrongAnswers = 0;
+            document.getElementById("result").classList.add("hidden");
+            document.getElementById("quiz").classList.remove("hidden");
+            loadQuestion();
+        }
+
+        // Start the quiz
+        loadQuestion();
+    </script>
+
+</body>
+</html>
